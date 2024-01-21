@@ -1,0 +1,9 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@media (max-width: 400px) {
+  .a {
+    display: none !important; /* Ensure complete removal, even if overridden */
+  }
+}
