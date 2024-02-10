@@ -1,7 +1,7 @@
 export function fetchAllProducts() {
     return new Promise(async (resolve) =>{
       //TODO: we will not hard-code server URL here
-      const response = await fetch('http://localhost:3000/products') 
+      const response = await fetch('http://localhost:3000/product') 
       const data = await response.json()
       resolve({data})
     }
@@ -11,7 +11,7 @@ export function fetchAllProducts() {
   export function fetchAllCategories() {
     return new Promise(async (resolve) =>{
       //TODO: we will not hard-code server URL here
-      const response = await fetch('http://localhost:3000/categories')
+      const response = await fetch('http://localhost:3000/category')
       const data = await response.json()
       resolve({data})
     }
@@ -21,7 +21,7 @@ export function fetchAllProducts() {
   export function fetchAllBrands() {
     return new Promise(async (resolve) =>{
       //TODO: we will not hard-code server URL here
-      const response = await fetch('http://localhost:3000/brands') 
+      const response = await fetch('http://localhost:3000/brand') 
       const data = await response.json()
       resolve({data})
     }
@@ -31,7 +31,7 @@ export function fetchAllProducts() {
   export function fetchProductById(id) {
     return new Promise(async (resolve) =>{
       //TODO: we will not hard-code server URL here
-      const response = await fetch('http://localhost:3000/products/'+id) 
+      const response = await fetch('http://localhost:3000/product/'+id) 
       const data = await response.json()
       resolve({data})
     }
@@ -40,7 +40,7 @@ export function fetchAllProducts() {
 
   export function createProduct(product) {
     return new Promise(async (resolve) => {
-      const response = await fetch('http://localhost:3000/products/', {
+      const response = await fetch('http://localhost:3000/product', {
         method: 'POST',
         body: JSON.stringify(product),
         headers: { 'content-type': 'application/json' },
@@ -71,7 +71,7 @@ export function fetchAllProducts() {
       queryString += `${key}=${Pagination[key]}&`
     }
     return new Promise(async (resolve) => {
-      const response = await fetch('http://localhost:3000/products?' + queryString);
+      const response = await fetch('http://localhost:3000/product?' + queryString);
       //TODO : check pagination error
       const totalItemsHeader = response.headers.get('X-Total-Count');
 
@@ -89,7 +89,7 @@ export function fetchAllProducts() {
   
 export function UpdateProduct(update) {
   return new Promise(async (resolve) =>{
-    const response = await fetch('http://localhost:3000/products/'+update.id,{
+    const response = await fetch('http://localhost:3000/product/'+update.id,{
       method:"PATCH",
       //we convert the data to json format
       body: JSON.stringify(update),

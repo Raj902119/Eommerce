@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import Modal from '../common/Modal';
+import { useAlert } from 'react-alert';
 
 function ProductForm() {
 
@@ -22,6 +23,7 @@ function ProductForm() {
   const dispatch = useDispatch();
   const params = useParams();
   const selectedProduct = useSelector(selectProductById);
+  const alert = useAlert();
   useEffect(() => {
     if (params.id) {
       dispatch(fetchProductByIdAsync(params.id));
@@ -78,9 +80,11 @@ function ProductForm() {
           product.id = params.id;
           product.rating = selectedProduct.rating || 0;
           dispatch(updateProductAsync(product));
+          alert.success("Product Updated");
           reset();
         } else {
           dispatch(createProductAsync(product));
+          alert.success("Product Created");
           reset();
           //TODO:  on product successfully added clear fields and show a message
         }
@@ -152,7 +156,7 @@ function ProductForm() {
                 >
                   <option value="">--choose brand--</option>
                   {brands.map((brand) => (
-                    <option value={brand.value}>{brand.label}</option>
+                    <option key={brand.value} value={brand.value}>{brand.label}</option>
                   ))}
                 </select>
               </div>
@@ -173,7 +177,7 @@ function ProductForm() {
                 >
                   <option value="">--choose category--</option>
                   {categories.map((category) => (
-                    <option value={category.value}>{category.label}</option>
+                    <option key={category.value} value={category.value}>{category.label}</option>
                   ))}
                 </select>
               </div>

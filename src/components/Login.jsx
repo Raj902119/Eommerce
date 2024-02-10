@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useForm } from "react-hook-form"
 import { Link, Navigate } from 'react-router-dom';
-import { CheckUserAsync } from '../app/authSlice';
+// import { CheckUserAsync } from '../app/authSlice';
 import { selectError,selectLoggedInUser } from '../app/authSlice';
-
+import { loginUser } from '../utils/authAPI';
+import { loginUserAsync } from '../app/authSlice';
 export default function Login() {
   const {
     register,
@@ -24,7 +25,7 @@ export default function Login() {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
-            src="../../public/TechHaven.png"
+            src="../../TechHaven.png"
             alt="Your Company"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -35,7 +36,7 @@ export default function Login() {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-6" onSubmit={handleSubmit((data) => {
               dispatch(
-                CheckUserAsync({ email: data.email, password: data.password })
+                loginUserAsync({ email: data.email, password: data.password })
               );
             })}>
             <div>

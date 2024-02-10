@@ -5,7 +5,6 @@ import { RadioGroup } from '@headlessui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductByIdAsync, selectProductById } from '../../app/productSlice';
 import { useParams } from 'react-router-dom';
-import { selectLoggedInUser } from "../../app/authSlice";
 
 const colors = [
   { name: 'White', class: 'bg-white', selectedClass: 'ring-gray-400' },
@@ -41,7 +40,6 @@ export default function AdminProductDetail() {
   const product = useSelector(selectProductById);
   const dispatch = useDispatch();
   const params = useParams();
-  const user = useSelector(selectLoggedInUser);
 
   useEffect(() => {
     dispatch(fetchProductByIdAsync(params.id));
@@ -49,7 +47,7 @@ export default function AdminProductDetail() {
 
   const handleClick = (e) => {
     e.preventDefault();
-    const newValue = {...product,quantity:1,user};
+    const newValue = {...product,quantity:1};
     delete newValue['id'];
     dispatch(addItemAsync(newValue));
   }

@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="flex flex-col items-center w-full my-20">
           <div className='mb-4 h-16 w-16'>
           <img
-                          src="../../public/TechHaven.png"
+                          src="../../TechHaven.png"
                           alt="Company Logo"
                         />
           </div>

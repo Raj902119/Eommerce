@@ -1,27 +1,30 @@
 import React, { useEffect } from 'react'
 
 import { SelectedUserOrders } from '../app/UserSlice'
-import { selectLoggedInUser } from '../app/authSlice'
 
 import { fetchLoggedInUserOrdersAsync } from '../app/UserSlice'
 import { useDispatch, useSelector } from 'react-redux'
-
-
+// import { SelectUserProfile } from '../app/UserSlice'
+import { discountedPrice } from '../app/constants'
+import { Grid } from 'react-loader-spinner'
+import { selectUserInfoStatus } from '../app/UserSlice'
 
 const UserOrders = () => {
-  const user = useSelector(selectLoggedInUser);
+  // const userInfo = useSelector(SelectUserProfile);
   const orders = useSelector(SelectedUserOrders);
+  const status = useSelector(selectUserInfoStatus);
   const dispatch=useDispatch();
+  
   useEffect(()=>{
-    if(user){
-    dispatch(fetchLoggedInUserOrdersAsync(user.id))
-    }
-  },[]);
+
+    dispatch(fetchLoggedInUserOrdersAsync())
+  },[dispatch]);
 
   return (
     
     <div>
-      {orders.map((order)=>
+      {orders && orders.map((order)=>(
+      <div key={order.id}>
         <div className="mx-auto mt-12 bg-white max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
             <h1 className="text-4xl text-center my-5 font-bold tracking-tight text-gray-900">
@@ -33,11 +36,11 @@ const UserOrders = () => {
             <div className="flow-root">
               <ul role="list" className="-my-6 divide-y divide-gray-200">
                 {order.items.map((product) => (
-                  <li key={product.id} className="flex py-6">
+                  <li key={product.product.id} className="flex py-6">
                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                       <img
-                        src={product.images[0]}
-                        alt={product.title}
+                        src={product.product.images[0]}
+                        alt={product.product.title}
                         className="h-full w-full object-cover object-center"
                       />
                     </div>
@@ -46,15 +49,15 @@ const UserOrders = () => {
                     <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              {product.title}
+                              {product.product.title}
                             </h3>
                             <h3 className="ml-4">Price</h3>
                           </div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                           <p className="mt-1 text-sm text-gray-500">
-                            {product.brand}
+                            {product.product.brand}
                           </p>
-                          <p className="ml-4">${product.price}</p>
+                          <p className="ml-4">${discountedPrice(product.product)}</p>
                           </div>
                           
                         </div>
@@ -113,9 +116,22 @@ const UserOrders = () => {
             </div>  
           </div>
         </div>
-      )}
+      </div>  
+      ))}
+      {status === 'loading' ? (
+        <Grid
+          height="80"
+          width="80"
+          color="rgb(79, 70, 229) "
+          ariaLabel="grid-loading"
+          radius="12.5"
+          wrapperStyle={{}}
+          wrapperClass=""
+          visible={true}
+        />
+      ) : null}
     </div>
-    
+
   )
 }
 

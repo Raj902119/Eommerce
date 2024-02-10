@@ -6,12 +6,12 @@ import { updateCartAsync,deleteCartItemAsync } from '../app/cartSlice';
 import { useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import {UpdateUserAsync, selectLoggedInUser} from '../app/authSlice'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addOrderAsync } from '../app/orderSlice';
 import { OrderStatus } from '../app/orderSlice';
-import { TotalOrders } from '../app/orderSlice';
 import Modal from '../common/Modal';
+import { discountedPrice } from '../app/constants';
+import { SelectUserProfile, UpdateUserProfileAsync } from '../app/UserSlice';
 
 function Checkout() {
   const {
@@ -24,10 +24,11 @@ function Checkout() {
 
   const items = useSelector(TotalItems);
   const dispatch = useDispatch();
-  const UserDate = useSelector(selectLoggedInUser);
-  const addresses = UserDate.address;
-  const TotalSum = items.reduce((result,e)=>{
-    return result += e.price*e.quantity;
+  const userInfo = useSelector(SelectUserProfile);
+  const addresses = userInfo.address;
+  
+  const TotalSum = items.reduce((result,item)=>{
+    return discountedPrice(item.product) * item.quantity + result;
   },0);
 
   const TotalQua = items.reduce((result,e)=>{
@@ -39,14 +40,14 @@ function Checkout() {
   })
 
   const handleChange = ((e,product) => {
-    dispatch(updateCartAsync({...product,quantity: +e.target.value}))
+    dispatch(updateCartAsync({id:product.id,quantity: +e.target.value}))
   })
 
   const [SelectAdd,SetSelectAdd] = useState(null);
   const [paymentMethod, setpaymentMethod] = useState(null);
 
   const handleAddChange = (e) =>{
-    SetSelectAdd(UserDate.address[e.target.value]);
+    SetSelectAdd(userInfo.address[e.target.value]);
   }
 
   const handlepayment = (e) =>{
@@ -55,24 +56,26 @@ function Checkout() {
 
   const handleOrder = () => {
     if(paymentMethod && SelectAdd){
-    dispatch(addOrderAsync({UserDate,paymentMethod,SelectAdd,TotalSum,TotalQua,items,Status:'pending'}));
+    dispatch(addOrderAsync({items,TotalSum,TotalQua,user:userInfo.id,paymentMethod,Status:'pending',SelectAdd}));
     }else {
       alert('Plz, Enter Address and Payment paymentMethod.');
     }
   }
 
   const OrderStat = useSelector(OrderStatus);
+  console.log(OrderStat);
   const [openModal, setOpenModal] = useState(null);
 
   return (
     <>
     {!items.length && <Navigate to='/' replace={true}/>}
-    {OrderStat && <Navigate to={`/order-sucess/${OrderStat.id}`} replace={true}/>}
+    {OrderStat && OrderStat.paymentMethod==="Cash Payment" && <Navigate to={`/order-sucess/${OrderStat.id}`} replace={true}/>}
+    {OrderStat && OrderStat.paymentMethod==="Online Payment" && <Navigate to={`/online-payment/${OrderStat.id}`} replace={true}/>}
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <form className="bg-white px-5 py-12 mt-12" onSubmit={handleSubmit((userInfo) => {
-            dispatch(UpdateUserAsync({...UserDate,address:[...UserDate.address,userInfo]}));
+          <form className="bg-white px-5 py-12 mt-12" onSubmit={handleSubmit((userinfo) => {
+            dispatch(UpdateUserProfileAsync({...userInfo,address:[...userInfo.address,userinfo]}));
             reset();
           })}>
             <div className="space-y-12">
@@ -278,18 +281,18 @@ function Checkout() {
                     <div className="mt-6 space-y-6">
                       <div className="flex items-center gap-x-3">
                         <input
-                          id="cash"
+                          id="Cash Payment"
                           name="payments"
                           onChange={handlepayment}
-                          value="Cash"
+                          value="Cash Payment"
                           type="radio"
                           className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                         />
                         <label
-                          htmlFor="cash"
+                          htmlFor="Cash Payment"
                           className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          Cash
+                          Cash Payment
                         </label>
                       </div>
                       <div className="flex items-center gap-x-3">
@@ -297,7 +300,7 @@ function Checkout() {
                           id="card"
                           name="payments"
                           onChange={handlepayment}
-                          value="Card Payment"
+                          value="Online Payment"
                           type="radio"
                           className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                         />
@@ -305,7 +308,7 @@ function Checkout() {
                           htmlFor="card"
                           className="block text-sm font-medium leading-6 text-gray-900"
                         >
-                          Card Payment
+                          Online Payment
                         </label>
                       </div>
                     </div>
@@ -329,8 +332,8 @@ function Checkout() {
                     <li key={product.id} className="flex py-6">
                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                         <img
-                          src={product.images[0]}
-                          alt={product.title}
+                          src={product.product.thumbnail}
+                          alt={product.product.title}
                           className="h-full w-full object-cover object-center"
                         />
                       </div>
@@ -339,15 +342,15 @@ function Checkout() {
                         <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              {product.title}
+                              {product.product.title}
                             </h3>
                             <h3 className="ml-4">Price</h3>
                           </div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                           <p className="mt-1 text-sm text-gray-500">
-                            {product.brand}
+                            {product.product.brand}
                           </p>
-                          <p className="ml-4">${product.price}</p>
+                          <p className="ml-4">${discountedPrice(product.product)}</p>
                           </div>
                           
                         </div>
@@ -368,7 +371,7 @@ function Checkout() {
                           </div>
 
                           <div className="flex">
-                          {openModal && <Modal title={`Remove ${product.title}`}
+                          {openModal && <Modal title={`Remove ${product.product.title}`}
                           message="Do you confirm that you want to remove the item?"
                           action="Remove" 
                           cancle="cancle" 

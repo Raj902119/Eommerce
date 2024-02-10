@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { TotalItems } from "../app/cartSlice";
 import { useSelector } from "react-redux";
 
-import { selectLoggedInUser } from "../app/authSlice";
+import { SelectUserProfile } from "../app/UserSlice";
 
 const userPro = {
   name: "Tom Cook",
@@ -36,10 +36,10 @@ function classNames(...classes) {
 
 function NavBar({ children }) {
   const items = useSelector(TotalItems);
-  const userinfo = useSelector(selectLoggedInUser);
+  const userInfo = useSelector(SelectUserProfile);
   return (
     <>
-      <div className="min-h-full ">
+     {userInfo && <div className="min-h-full ">
         <Disclosure as="nav" className="bg-gray-800">
           {({ open }) => (
             <>
@@ -50,7 +50,7 @@ function NavBar({ children }) {
                       <Link to="/">
                         <img
                           className="h-10 w-10"
-                          src="../../public/TechHaven.png"
+                          src="../../TechHaven.png"
                           alt="Your Company"
                         />
                       </Link>
@@ -58,7 +58,7 @@ function NavBar({ children }) {
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
                         {navigation.map((item) => (
-                        item[userinfo.role] && <Link
+                        item[userInfo.role] && <Link
                             to={item.link}
                             key={item.name}
                             className={classNames(
@@ -187,10 +187,10 @@ function NavBar({ children }) {
                     </div>
                     <div className="ml-3">
                       <div className="text-base font-medium leading-none text-white">
-                        {userPro.name}
+                        {userInfo.name}
                       </div>
                       <div className="text-sm font-medium leading-none text-gray-400">
-                        {userPro.email}
+                        {userInfo.email}
                       </div>
                     </div>
                     <Link to="/cart">
@@ -239,7 +239,7 @@ function NavBar({ children }) {
             {children}
           </div>
         </main>
-      </div>
+      </div>}
     </>
   );
 }

@@ -24,7 +24,7 @@ export default function Signup() {
         <Link to='/'>
           <img
             className="mx-auto h-10 w-10"
-            src="../../public/TechHaven.png"
+            src="../../TechHaven.png"
             alt="Your Company"
           />
           </Link>

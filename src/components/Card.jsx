@@ -4,8 +4,8 @@ import { TotalItems } from '../app/cartSlice';
 import { updateCartAsync,deleteCartItemAsync } from '../app/cartSlice';
 import { Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import { selectLoggedInUser } from '../app/authSlice';
 import Modal from '../common/Modal';
+import { discountedPrice } from '../app/constants';
 
 export default function Cart() {
   const dispatch = useDispatch();
@@ -16,8 +16,8 @@ export default function Cart() {
   //   dispatch(fetchAllUserItemsAsync(userinfo));
   // },[dispatch,userinfo])
   const items = useSelector(TotalItems);
-  const TotalSum = items.reduce((result,e)=>{
-    return result += e.price*e.quantity;
+  const TotalSum = items.reduce((result,item)=>{
+    return discountedPrice(item.product) * item.quantity + result;
   },0);
 
   const TotalQua = items.reduce((result,e)=>{
@@ -29,7 +29,7 @@ export default function Cart() {
   })
 
   const handleChange = ((e,product) => {
-    dispatch(updateCartAsync({...product,quantity: +e.target.value}))
+    dispatch(updateCartAsync({id:product.id,quantity: +e.target.value,}))
   })
 
   const [openModal, setOpenModal] = useState(null);
@@ -49,8 +49,8 @@ export default function Cart() {
                   <li key={product.id} className="flex py-6">
                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                       <img
-                        src={product.images[0]}
-                        alt={product.title}
+                        src={product.product.thumbnail}
+                        alt={product.product.title}
                         className="h-full w-full object-cover object-center"
                       />
                     </div>
@@ -59,15 +59,15 @@ export default function Cart() {
                     <div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                             <h3>
-                              {product.title}
+                              {product.product.title}
                             </h3>
                             <h3 className="ml-4">Price</h3>
                           </div>
                           <div className="flex justify-between text-base font-medium text-gray-900">
                           <p className="mt-1 text-sm text-gray-500">
-                            {product.brand}
+                            {product.product.brand}
                           </p>
-                          <p className="ml-4">${product.price}</p>
+                          <p className="ml-4">${discountedPrice(product.product)}</p>
                           </div>
                           
                         </div>
@@ -88,7 +88,7 @@ export default function Cart() {
                         </div>
 
                         <div className="flex">
-                        {openModal && <Modal title={`Remove ${product.title}`}
+                        {openModal && <Modal title={`Remove ${product.product.title}`}
                           message="Do you confirm that you want to remove the item?"
                           action="Remove" 
                           cancle="cancle" 

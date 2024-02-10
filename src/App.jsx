@@ -9,14 +9,11 @@ import Protected from './components/Protected';
 import ErrorPage from './pages/ErrorPage.jsx';
 import OrderSucessPage from './pages/OrderSucessPage.jsx';
 import UserOrdersPage from './pages/UserOrdersPage.jsx';
-
 import { useEffect} from 'react';
-import { TotalItems } from './app/cartSlice';
 import {selectLoggedInUser} from './app/authSlice.js';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { fetchAllUserItemsAsync } from './app/cartSlice';
-import { fetchLoggedInUserOrdersAsync } from './app/UserSlice.js';
 
 import {
   BrowserRouter,
@@ -31,20 +28,23 @@ import ProtectedAdmin from './AdminFeature/ProtectedAdmin.jsx';
 import AdminProductDetail from './AdminFeature/components/AdminProductDetails.jsx';
 import ProductFormPage from './pages/ProductFormPage.jsx';
 import AdminOrderPage from './pages/AdminOrderPage.jsx';
+import OnlinePaymentPage from './pages/OnlinePaymentPage.jsx';
+import { fetchLoggedInUserAsync } from './app/UserSlice.js';
 function App() {
   
   const userinfo = useSelector(selectLoggedInUser);
-  const data = useSelector(TotalItems);
   const dispatch = useDispatch();
+
+
   useEffect(()=>{
     if(userinfo){
-      dispatch(fetchAllUserItemsAsync(userinfo));
-      dispatch(fetchLoggedInUserOrdersAsync(userinfo.id))
+      dispatch(fetchAllUserItemsAsync());
+      dispatch(fetchLoggedInUserAsync());
     }
   },[dispatch,userinfo])
 
   return (
-    <BrowserRouter>
+     <BrowserRouter>
       <Routes>
           <Route path="/" exact element={<Protected><Home /></Protected>} />
           <Route path="/admin" exact element={<AdminHome />} />
@@ -62,6 +62,7 @@ function App() {
           <Route path='/admin/order' exact element={<ProtectedAdmin><AdminOrderPage /></ProtectedAdmin>} />
           <Route path='/admin/product-form/edit/:id' exact element={<ProtectedAdmin><ProductFormPage /></ProtectedAdmin>} />
           <Route path="/order-sucess/:id" exact element={<Protected><OrderSucessPage /></Protected>} />
+          <Route path="/online-payment/:id" exact element={<Protected><OnlinePaymentPage /></Protected>} />
           <Route path="*" exact element={<ErrorPage />} />
         </Routes>
     </BrowserRouter>

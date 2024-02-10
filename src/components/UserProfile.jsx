@@ -1,32 +1,33 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectLoggedInUser } from "../app/authSlice";
-import { UpdateUserAsync } from "../app/authSlice";
+import { SelectUserProfile } from "../app/UserSlice";
+import { UpdateUserProfile } from "../utils/UserAPI";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+
 
 const UserProfile = () => {
   //will do payment and profile in backend
   const [selectedIndex, setselectedIndex] = useState(-1);
   const [Addform, setAddform] = useState(false);
-  const user = useSelector(selectLoggedInUser);
+  const userInfo = useSelector(SelectUserProfile);
   const dispatch = useDispatch();
 
   const handleRemove = (e, index) => {
-    const newUser = { ...user, address: [...user.address] };
+    const newUser = { ...userInfo, address: [...userInfo.address] };
     newUser.address.splice(index, 1);
-    dispatch(UpdateUserAsync(newUser));
+    dispatch(UpdateUserProfile(newUser));
   };
   const handleEdit = (addressUpdate, index) => {
-    const newUser = { ...user, address: [...user.address] };
+    const newUser = { ...userInfo, address: [...userInfo.address] };
     newUser.address.splice(index, 1, addressUpdate);
-    dispatch(UpdateUserAsync(newUser));
+    dispatch(UpdateUserProfile(newUser));
     setselectedIndex(-1);
   };
   const handleEditForm = (index) => {
     setselectedIndex(index);
-    const addd = user.address[index];
+    const addd = userInfo.address[index];
     setValue("fullName", addd.fullName);
     setValue("Email", addd.Email);
     setValue("PhoneNo", addd.PhoneNo);
@@ -51,8 +52,8 @@ const UserProfile = () => {
   };
 
   const handleAddInfo = (data) => {
-    const newUser = { ...user, address: [...user.address, data] };
-    dispatch(UpdateUserAsync(newUser));
+    const newUser = { ...userInfo, address: [...userInfo.address, data] };
+    dispatch(UpdateUserProfile(newUser));
     setAddform(false);
   };
 
@@ -61,14 +62,14 @@ const UserProfile = () => {
       <div className="mx-auto mt-12 bg-white max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
           <h1 className="text-4xl my-5 font-bold tracking-tight text-gray-900">
-            Name: {user.name ? user.name : "Guest User"}
+            Name: {userInfo.name ? userInfo.name : "Guest User"}
           </h1>
           <h3 className="text-xl my-5 font-bold tracking-tight text-gray-900">
-            Email address : {user ? user.email : "xyz@gmail.com"}
+            Email address : {userInfo ? userInfo.email : "xyz@gmail.com"}
           </h3>
-          {user.role === "admin" && (
+          {userInfo.role === "admin" && (
             <h3 className="text-xl my-5 font-bold tracking-tight text-gray-900">
-              Role : {user && user.role}
+              Role : {userInfo && userInfo.role}
             </h3>
           )}
           <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
@@ -234,7 +235,6 @@ const UserProfile = () => {
                     <div className="mt-6 flex items-center justify-end gap-x-6">
                       <button
                         onClick={(e) => setAddform(false)}
-                        type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       >
                         Cancel
@@ -250,8 +250,8 @@ const UserProfile = () => {
                 </form>
               ) : null}
             </div>
-            {user.address.map((add, index) => (
-              <div>
+            {userInfo.address.map((add, index) => (
+              <div key={index}>
                 {selectedIndex === index ? (
                   <form
                     className="bg-white px-5 py-8 mt-2 mb-2"

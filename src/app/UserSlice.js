@@ -1,19 +1,18 @@
 import { createAsyncThunk,createSlice } from "@reduxjs/toolkit";
-import { fetchLoggedInUserOrders,UpdateUserProfile } from "../utils/UserAPI";
+import { fetchLoggedInUserOrders,UpdateUserProfile,fetchLoggedInUser } from "../utils/UserAPI";
 
 
 const initialState = {
     //initial state for authSlice
-    UserOrders: [],
     status: 'idle',
-    UserProfile: null,  // this info will be used in case of detailed user info, while auth will 
+    UserProfile: { orders: null } // this info will be used in case of detailed user info, while auth will 
     // only be used for loggedInUser id etc checks
   };
 
   export const fetchLoggedInUserOrdersAsync = createAsyncThunk(
     'user/fetchLoggedInUserOrders',
-    async (userId) => {
-      const response = await fetchLoggedInUserOrders(userId);
+    async () => {
+      const response = await fetchLoggedInUserOrders();
       // The value we return becomes the `fulfilled` action payload
       return response.data;
     }
@@ -23,6 +22,15 @@ const initialState = {
     'user/UpdateUser',
     async (updateUser) => {
       const response = await UpdateUserProfile(updateUser);
+      // The value we return becomes the `fulfilled` action payload
+      return response.data;
+    }
+  );
+
+  export const fetchLoggedInUserAsync = createAsyncThunk(
+    'user/fetchLoggedInUser',
+    async () => {
+      const response = await fetchLoggedInUser();
       // The value we return becomes the `fulfilled` action payload
       return response.data;
     }
@@ -42,7 +50,7 @@ export const  UserOrdersSlice = createSlice({
         })
         .addCase(fetchLoggedInUserOrdersAsync.fulfilled, (state, action) => {
           state.status = 'idle';
-          state.UserOrders=action.payload;
+          state.UserProfile.orders=action.payload;
         })
         .addCase(UpdateUserProfileAsync.pending, (state) => {
           state.status = 'loading';
@@ -50,10 +58,19 @@ export const  UserOrdersSlice = createSlice({
         .addCase(UpdateUserProfileAsync.fulfilled, (state, action) => {
           state.status = 'idle';
           state.UserProfile=action.payload;
+        })
+        .addCase(fetchLoggedInUserAsync.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchLoggedInUserAsync.fulfilled, (state, action) => {
+          state.status = 'idle';
+          // this info can be different or more from logged-in User info
+          state.UserProfile = action.payload;
         });
     }
 });        
 
-export const SelectedUserOrders = (state) => state.user.UserOrders;
+export const SelectedUserOrders = (state) => state.user.UserProfile.orders;
 export const SelectUserProfile = (state) => state.user.UserProfile;
+export const selectUserInfoStatus = (state) => state.user.status;
 export default UserOrdersSlice.reducer;

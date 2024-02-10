@@ -5,9 +5,10 @@ import { RadioGroup } from '@headlessui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductByIdAsync, selectProductById } from '../app/productSlice';
 import { useParams } from 'react-router-dom';
-import { selectLoggedInUser } from "../app/authSlice";
 import { TotalItems } from "../app/cartSlice";
 import { useAlert } from 'react-alert'
+import {discountedPrice} from "../app/constants";
+import { SelectUserProfile } from "../app/UserSlice";
 
 const colors = [
   { name: 'White', class: 'bg-white', selectedClass: 'ring-gray-400' },
@@ -36,6 +37,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+
 export default function ProductDetail() {
 
   const alert = useAlert()
@@ -44,9 +46,10 @@ export default function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState(sizes[2])
 
   const product = useSelector(selectProductById);
+  const user = useSelector(SelectUserProfile);
+
   const dispatch = useDispatch();
   const params = useParams();
-  const user = useSelector(selectLoggedInUser);
   const items = useSelector(TotalItems);
 
   useEffect(() => {
@@ -55,9 +58,8 @@ export default function ProductDetail() {
 
   const handleClick = (e) => {
     e.preventDefault();
-    if (items.findIndex((item) => item.productId === product.id) < 0){
-      const newValue = {...product,productId:product.id,quantity:1,user};
-      delete newValue['id'];
+    if (items.findIndex((item) => item.product.id === product.id) < 0){
+      const newValue = {product:product.id,quantity:1};
       dispatch(addItemAsync(newValue));
     }else{
       alert.show('Product already added to Cart')
@@ -157,7 +159,7 @@ export default function ProductDetail() {
           <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
               <p className="text-3xl tracking-tight text-gray-900">
-               ${product.price}
+               ${discountedPrice(product)}
               </p>
 
             {/* Reviews */}

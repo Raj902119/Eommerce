@@ -1,6 +1,6 @@
 export function CreateOrder(orderDate) {
     return new Promise(async (resolve) =>{
-      const response = await fetch('http://localhost:3000/orders',{
+      const response = await fetch('http://localhost:3000/order',{
         method:"POST",
         //we convert the data to json format
         body: JSON.stringify(orderDate),
@@ -15,7 +15,7 @@ export function CreateOrder(orderDate) {
 
   export function updateOrder(order) {
     return new Promise(async (resolve) => {
-      const response = await fetch('http://localhost:3000/orders/'+order.id, {
+      const response = await fetch('http://localhost:3000/order/'+order.id, {
         method: 'PATCH',
         body: JSON.stringify(order),
         headers: { 'content-type': 'application/json' },
@@ -35,7 +35,7 @@ export function CreateOrder(orderDate) {
       queryString += `${key}=${pagination[key]}&`
     }
     return new Promise(async (resolve) => {
-      const response = await fetch('http://localhost:3000/orders?' + queryString);
+      const response = await fetch('http://localhost:3000/order?' + queryString);
       //TODO : check pagination error
       const totalItemsHeader = response.headers.get('X-Total-Count');
       let totalItems = 0;

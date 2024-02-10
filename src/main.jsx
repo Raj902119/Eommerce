@@ -1,7 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './app/store';
+import { store,persistor  } from './app/store';
+import { PersistGate } from 'redux-persist/integration/react';
 import App from './App';
 import './index.css';
 import { transitions, positions, Provider as AlertProvider } from 'react-alert'
@@ -22,9 +23,11 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
     <AlertProvider template={AlertTemplate} {...options}>
     <App />
   </AlertProvider>
+  </PersistGate>
     </Provider>
   </React.StrictMode>
 );

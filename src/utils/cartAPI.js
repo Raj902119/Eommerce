@@ -13,10 +13,10 @@ export function AddItem(item) {
   );
 }
 
-export function fetchAllUserItems(userinfo) {
+export function fetchAllUserItems() {
   return new Promise(async (resolve) => {
-    const email = userinfo.email;
-    const response = await fetch('http://localhost:3000/cart?user.email=' + email);
+    //to be changed.
+    const response = await fetch('http://localhost:3000/cart');
     const data = await response.json();
     resolve({ data });
   });
@@ -49,9 +49,9 @@ export function DeleteCart(delId) {
   );
 }
 
-export async function resetCart(userinfo) {
+export async function resetCart() {
   try {
-    const response = await fetchAllUserItems(userinfo);
+    const response = await fetchAllUserItems();
     const items = await response.data;
     for (let item of items) {
       await DeleteCart(item.id);
